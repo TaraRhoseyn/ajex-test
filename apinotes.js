@@ -80,8 +80,39 @@ xhr.onreadystatechange = function() {
 // telling the console.log to wait for 500 miliseconds, so giving our 'onreadystatechange' function time to reach
 // a readyState of 4
 setTimeout(function() {
+    // this console.log will only run after the time specified, in this case 500 ms
     console.log(data);
 }, 500);
 
 // CALLBACK FUNCTION
+// Remember, a function is also an object (everything is an object in JS)
+// So it can be passed as a parameter/argument to another function
+// a callback is a function that's passed as a meter to another function
+// and executed inside that function
 
+
+// 'cb' stands for callback, function argument passed to function
+
+function getData(cb) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "https://ci-swapi.herokuapp.com/api/");
+    xhr.send();
+
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            // below actually runs the function we pass in as a callback
+            cb(JSON.parse(this.responseText));
+        };
+    };
+};
+
+// OT: I don't understand where 'data' argument is actually coming from?
+// from Slack:
+// 'data' is taking the value 'JSON.parse(this.responseText), the data returned from the API request
+// suggests looking into 'fetch', more modern way than XMLHttpRequest
+
+function printDataToConsole(data) {
+    console.log(data);
+}
+
+getData(printDataToConsole);
