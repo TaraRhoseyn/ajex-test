@@ -1,7 +1,5 @@
-const baseURL = "https://ci-swapi.herokuapp.com/api/";
-// 'cb' stands for callback, function argument passed to function
 
-function getData(type, cb) {
+function getData(url, cb) {
     var xhr = new XMLHttpRequest();
 
     xhr.onreadystatechange = function() {
@@ -11,7 +9,7 @@ function getData(type, cb) {
         }
     };
 
-    xhr.open("GET", baseURL + type + "/");
+    xhr.open("GET", url + type + "/");
     xhr.send();
 }
 
@@ -27,14 +25,29 @@ function getTableHeaders(obj) {
     return `<tr>${tableHeaders}</tr>`;
 }
 
+
+function generatePaginationButtons(next, prev) {
+    if (next && prev) { // if we have a next & prev value (more data)
+        return `<button onclick="writeToDocument('${prev}')">Previous</button>
+        <button onclick="writeToDocument('${next}')">Next</button>`;
+    } else if (next && !prev) { // if only next and not prev (start of data set)
+        return `<button onclick="writeToDocument('${prev}')">Next</button>`;
+    } else if (!next && prev) { // if only prev and no next (end of data set)
+        return `<button onclick="writeToDocument('${prev}')">Previous</button>`;
+    }
+}
+
 // 'type' as in type of things from API, e.g. people/starships/vehicles/etc
-function writeToDocument(type) {
+function writeToDocument(url) {
     // below el variable stores our data ID, helps cut out other content when pressing buttons
     var el = document.getElementById("data");
     el.innerHTML = "";  // setting this to an empty string will clear the element everytime button is clicked
 
-    getData(type, function(data) {
-        var tableRows = []; // initise as an empty array
+    getData(url, function(data) {
+        var pagination;
+        if (data.next|| data.previous) { // if data.next or data.previous exist...
+            pagination = generatePaginationButtons(data.next, data.prev);
+        } 
         data = data.results;
         var tableHeaders = getTableHeaders(data[0]); // passing through first object in the array
 
@@ -59,7 +72,7 @@ function writeToDocument(type) {
             tableRows.push(`<tr>${dataRow}</tr>`);
         });
 
-        el.innerHTML = `<table>${tableHeaders}${tableRows}</table>`;
+        el.innerHTML = `<table>${tableHeaders}${tableRows}</table>${pagination}`;
     });
 }
 
