@@ -3,35 +3,63 @@ const baseURL = "https://ci-swapi.herokuapp.com/api/";
 
 function getData(type, cb) {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", baseURL + type + "/");
-    xhr.send();
 
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             // below actually runs the function we pass in as a callback
             cb(JSON.parse(this.responseText));
-        };
+        }
     };
-};
+
+    xhr.open("GET", baseURL + type + "/");
+    xhr.send();
+}
+
+function getTableHeaders(obj) {
+    var tableHeaders = [];
+
+    // below iterates over the keys in our object
+    // and pushes them to our tableHeaders array
+    Object.keys(obj).forEach(function(key) {
+        tableHeaders.push(`<td>${key}</td>`)
+    });
+
+    return `<tr>${tableHeaders}</tr>`;
+}
+
 // 'type' as in type of things from API, e.g. people/starships/vehicles/etc
 function writeToDocument(type) {
     // below el variable stores our data ID, helps cut out other content when pressing buttons
     var el = document.getElementById("data");
-    el.innerHTML = ""; // setting this to an empty string will clear the element everytime button is clicked
+    el.innerHTML = "";  // setting this to an empty string will clear the element everytime button is clicked
 
     getData(type, function(data) {
-        // console.dir means directory, pass in data
-        // console.dir(data);
+        var tableRows = []; // initise as an empty array
         data = data.results;
+        var tableHeaders = getTableHeaders(data[0]); // passing through first object in the array
 
-
-        // this function will run for each element in 'data' variable
         data.forEach(function(item) {
-            el.innerHTML += "<p>" + item.name; "</p"
-        })
+            var dataRow = [];
+            // iterating over the keys, our star wars data is held in key-value pairs (e.g. name: luke skywalker)
+            // doing a second forEach loop inside this forEach loop
+            // Object.keys(item).forEach(function(key) {
+            // 
+            // films doesn't have a key called name, so we need to fix that
+            // by iterating over the keys to build a table of data wihtout
+            // explicitly specifying a property (like we have with 'name')
 
-        // we're setting out data to 'results' here because that's what it's called in the API star wars object
-        // but just the data.results below isn't enough 'data.results'
-        // we need to overwrite our data variable itself with the 
+            Object.keys(item).forEach(function(key) {
+                // rowData is set to the value of the key, made sure it's string
+                var rowData = item[key].toString();
+                var truncatedData = rowData.substring(0,15); // from 0 to 15th character
+                dataRow.push(`<td>${truncatedData}</td>`);
+            });
+            // once the row is created after it's iterated over, we need to push that
+            // row into tableRows array:
+            tableRows.push(`<tr>${dataRow}</tr>`);
+        });
+
+        el.innerHTML = `<table>${tableHeaders}${tableRows}</table>`;
     });
 }
+

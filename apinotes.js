@@ -116,3 +116,33 @@ function printDataToConsole(data) {
 }
 
 getData(printDataToConsole);
+
+// 'type' as in type of things from API, e.g. people/starships/vehicles/etc
+function writeToDocument(type) {
+    // below el variable stores our data ID, helps cut out other content when pressing buttons
+    var el = document.getElementById("data");
+    el.innerHTML = ""; // setting this to an empty string will clear the element everytime button is clicked
+
+    getData(type, function(data) {
+        // console.dir means directory, pass in data
+        // console.dir(data);
+        data = data.results;
+
+
+        // this function will run for each element in 'data' variable
+        data.forEach(function(item) {
+            // iterating over the keys, our star wars data is held in key-value pairs (e.g. name: luke skywalker)
+            // doing a second forEach loop inside this forEach loop
+            Object.keys(item).forEach(function(key) {
+                console.log(key);
+                // films doesn't have a key called name, so we need to fix that
+                // by iterating over the keys to build a table of data wihtout
+                // explicitly specifying a property (like we have with 'name')
+            })
+            el.innerHTML += "<p>" + item.name; "</p"
+        })
+
+        // we're setting out data to 'results' here because that's what it's called in the API star wars object
+        // but just the data.results below isn't enough 'data.results'
+        // we need to overwrite our data variable itself with the 
+    });
