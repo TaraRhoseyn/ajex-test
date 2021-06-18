@@ -213,3 +213,9 @@ function writeToDocument(type) {
     });
 }
 
+// useful to replace content
+// first argument finds what needs to be replaced between / / and the second arugment
+// is what will be in its place
+// e.g. an empty string
+
+el.innerHTML = `<table>${tableHeaders}${tableRows}</table>${pagination}.replace(/b/"")`;
